@@ -1,0 +1,65 @@
+{
+    "dataset": "PROTEINS",
+    "out_dir": "./results/",
+    "eval_mad": false,
+    "diff": 0,
+    "ref_diff": 3,
+
+    "feature_params": {
+        "degree": true,
+        "onehot_maxdeg": 100,
+        "AK": 0,
+        "centrality": false,
+        "remove_edges": "none",
+        "edge_noises_add": 0,
+        "edge_noises_delete": 0,
+        "group_degree": 0,
+        "virtual_node": false
+    },
+
+    "pre_params": {
+        "use_pre": true,
+        "loss_type": 5,
+        "epochs": 200,
+        "lr": 0.001,
+        "batch_size": 128,
+        "aug_ratio": 0.2,
+        "T": 0.5,
+        "aug_step": 200,
+        "train_step": 30,
+        "aug_K": 1,
+        "alpha": 2.0,
+        "beta": -0.4,
+        "weights_dir": "./weights",
+        "aug_mode": "uniform",
+        "load_pre_model": false
+    },
+
+    "params": {
+        "gpu": 1,
+        "seed": 41,
+        "net": "GNN",
+        "epoch_select": "test_max",
+        "with_eval_mode": true,
+        "data_root": "datasets",
+        "epochs": 100,
+        "batch_size": 128,
+        "lr": 0.001,
+        "scheduler": false,
+        "weight_decay": 0
+    },
+
+    "net_params": {
+        "gnn_type": "gcn",
+        "num_layers": 3,
+        "num_fc": 2,
+        "hidden_dim": 128,
+        "node_encoder": 1,
+        "residual": false,
+        "global_pool": "sum",
+        "dropout": 0.0,
+        "batch_norm": true,
+        "concat": false,
+        "sum_x":false
+    }
+}
