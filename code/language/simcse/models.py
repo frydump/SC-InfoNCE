@@ -403,24 +403,13 @@ class RobertaForCL(RobertaPreTrainedModel):
             )
 
 def simclr_loss(x1, x2, T=0.05, LARGE_NUMBER=1e9):
-    """
-    SimCLR风格的InfoNCE损失实现，z1/z2/z3均为(batch, hidden)
-    Args:
-        z1, z2, z3: 三组特征向量 (batch, hidden)
-        T: 温度参数
-        LARGE_NUMBER: 用于掩码的极大值
-    Returns:
-        loss: 损失标量
-        prob: x0自相似softmax的前10个概率
-    """
 
-    # 拼接x1和x2
     z = torch.cat([x1, x2], dim=0)  # (2N, hidden)
     n = z.shape[0]
     z = F.normalize(z, p=2, dim=1) / np.sqrt(T)
 
     logits = z @ z.t()  # (2N, 2N)
-    # logits[torch.arange(n), torch.arange(n)] = -LARGE_NUMBER  # 可选：掩码对角线
+    # logits[torch.arange(n), torch.arange(n)] = -LARGE_NUMBER 
 
     logprob = F.softmax(logits, dim=1)
     logprob = torch.log(logprob)
@@ -445,16 +434,6 @@ def info_nce(z1, z2, temperature=0.05):
     return loss
 
 def sc_infonce_loss(x1, x2, T=0.05, alpha=1.0, beta=0.0):
-    """
-    SC_InfoNCE loss implementation
-    Args:
-        x1, x2: 两组特征向量 (batch, hidden)
-        T: 温度参数
-        alpha: 正样本权重参数
-        beta: 负样本权重参数
-    Returns:
-        loss: 损失标量
-    """
     x1_abs = x1.norm(dim=1)
     x2_abs = x2.norm(dim=1)
     
@@ -464,27 +443,16 @@ def sc_infonce_loss(x1, x2, T=0.05, alpha=1.0, beta=0.0):
     
     sim_matrix = torch.exp(matrix)
     pos = torch.diag(sim_matrix)
-    p_ij = pos / (sim_matrix.sum(dim=1))
+    p_ij = pos / (sim_matrix.sum(dim=1)- pos_sim)
     
     with torch.no_grad():
-        alpha = p_ij - 1 + alpha
+        alpha = - 1 + alpha
     
     loss = - torch.log(p_ij) - alpha * pos_sim + neg_sim * beta
     
     return loss.mean()
 
 def simcse_loss(z1, z2, T=0.05):
-    """
-    Compute InfoNCE loss.
-
-    Args:
-        z1 (Tensor): shape (batch_size, dim)
-        z2 (Tensor): shape (batch_size, dim)
-        temperature (float): temperature parameter
-
-    Returns:
-        loss (Tensor): scalar loss
-    """
     # Compute cosine similarity matrix
     sim_matrix = F.cosine_similarity(z1.unsqueeze(1), z2.unsqueeze(0), dim=-1) / T
 
@@ -496,14 +464,7 @@ def simcse_loss(z1, z2, T=0.05):
     return loss
 
 def dcl_loss(x1, x2, T=0.05):
-    """
-    DCL loss implementation
-    Args:
-        x1, x2: 两组特征向量 (batch, hidden)
-        T: 温度参数
-    Returns:
-        loss: 损失标量
-    """
+
     x1_abs = x1.norm(dim=1)
     x2_abs = x2.norm(dim=1)
     
@@ -511,21 +472,14 @@ def dcl_loss(x1, x2, T=0.05):
     
     sim_matrix = torch.exp(matrix)
     pos = torch.diag(sim_matrix)
-    p_ij = pos / (sim_matrix.sum(dim=1))
+    p_ij = pos / (sim_matrix.sum(dim=1)-pos)
     
     loss = - torch.log(p_ij)
     
     return loss.mean()
 
 def simple_cl_loss(x1, x2, T=0.05):
-    """
-    Simple CL loss implementation
-    Args:
-        x1, x2: 两组特征向量 (batch, hidden)
-        T: 温度参数
-    Returns:
-        loss: 损失标量
-    """
+
     x1_abs = x1.norm(dim=1)
     x2_abs = x2.norm(dim=1)
     
@@ -540,11 +494,6 @@ def simple_cl_loss(x1, x2, T=0.05):
 def dhel_loss(x1, x2, T=0.05):
     """
     Decoupled Hyperspherical Energy Loss (DHEL) implementation
-    Args:
-        x1, x2: 两组特征向量 (batch, hidden)
-        T: 温度参数
-    Returns:
-        loss: 损失标量
     """
     z_1 = F.normalize(x1, p=2, dim=1)
     z_2 = F.normalize(x2, p=2, dim=1)
@@ -555,7 +504,6 @@ def dhel_loss(x1, x2, T=0.05):
     
     pos_sim = torch.exp(torch.sum(z_1 * z_2, dim=-1) / T)
     
-    # 包含增强版本
     sim_matrix_pos = torch.exp(torch.mm(z_2, z_2.t()) / T)
     sim_matrix_pos = sim_matrix_pos.masked_fill(mask, 0)
     
@@ -566,11 +514,6 @@ def dhel_loss(x1, x2, T=0.05):
 def gkcl_loss(x1, x2, T=0.05):
     """
     Gaussian-Kernel Contrastive Loss (GKCL) implementation
-    Args:
-        x1, x2: 两组特征向量 (batch, hidden)
-        T: 温度参数
-    Returns:
-        loss: 损失标量
     """
     def gaussian_kernel(x, t):
         pairwise_distances = torch.pdist(x, p=2)
