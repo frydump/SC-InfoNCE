@@ -1,6 +1,6 @@
 # Understanding InfoNCE: Transition Probability Matrix Induced Feature Clustering
 
-> This is an anonymous repository for NeurIPS 2025 Paper #16944, intentionally anonymized for the double-blind review process.
+> This repository contains the official implementation of our paper “Understanding InfoNCE: Transition Probability Matrix–Induced Feature Clustering”.
 
 ## Overview
 
