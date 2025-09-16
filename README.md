@@ -1,6 +1,6 @@
 # Understanding InfoNCE: Transition Probability Matrix Induced Feature Clustering
 
-> This repository contains the official implementation of our paper “Understanding InfoNCE: Transition Probability Matrix–Induced Feature Clustering”.
+> This repository contains the official implementation of our paper “Understanding InfoNCE: Transition Probability Matrix Induced Feature Clustering”.
 
 ## Overview
 
